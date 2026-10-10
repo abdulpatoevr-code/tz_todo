@@ -8,35 +8,13 @@ from apps.catalog.models import Category, Product, ProductImage
 from apps.orders.models import Order, OrderItem
 from apps.users.models import UserProfile
 
-import urllib.request
-import ssl
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
-
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-}
-
-def download_or_create_image(filepath, url, text, bg_color=(41, 128, 185), size=(600, 600)):
+def create_placeholder_image(filepath, text, bg_color=(41, 128, 185), size=(600, 600)):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    if os.path.exists(filepath) and os.path.getsize(filepath) > 5000:
-        return
-    if url:
-        try:
-            req = urllib.request.Request(url, headers=HEADERS)
-            with urllib.request.urlopen(req, context=ctx, timeout=10) as response:
-                content = response.read()
-                with open(filepath, 'wb') as f:
-                    f.write(content)
-                return
-        except Exception as e:
-            print(f"Fallback to placeholder for {filepath}: {e}")
-
     img = Image.new('RGB', size, color=bg_color)
     draw = ImageDraw.Draw(img)
+    # Simple draw text or box
     draw.rectangle([20, 20, size[0]-20, size[1]-20], outline=(255, 255, 255), width=3)
+    # Draw simple label
     try:
         font = ImageFont.load_default()
     except Exception:
